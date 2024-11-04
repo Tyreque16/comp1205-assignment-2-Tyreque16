@@ -1,0 +1,60 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Problem 1
+      id: problem-1
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Problem 1
+        setup-command: pip install pytest
+        command: pytest .github/test_Problem1.py
+        timeout: 10
+        max-score: 25
+    - name: Problem 2
+      id: problem-2
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Problem 2
+        setup-command: pip install pytest
+        command: pytest .github/test_Problem2.py
+        timeout: 10
+        max-score: 35
+    - name: Problem 3
+      id: problem-3
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Problem 3
+        setup-command: pip install pytest
+        command: pytest .github/test_problem3.py
+        timeout: 10
+        max-score: 10
+    - name: Problem 4
+      id: problem-4
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Problem 4
+        setup-command: pip install pytest
+        command: pytest .github/test_Problem4.py
+        timeout: 10
+        max-score: 30
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        PROBLEM-1_RESULTS: "${{steps.problem-1.outputs.result}}"
+        PROBLEM-2_RESULTS: "${{steps.problem-2.outputs.result}}"
+        PROBLEM-3_RESULTS: "${{steps.problem-3.outputs.result}}"
+        PROBLEM-4_RESULTS: "${{steps.problem-4.outputs.result}}"
+      with:
+        runners: problem-1,problem-2,problem-3,problem-4
